@@ -1,0 +1,41 @@
+# Répertoires de Symfony
+/var/
+/vendor/
+
+# Cache et logs Symfony
+/app/cache/
+/app/logs/
+/var/cache/
+/var/logs/
+/var/sessions/
+
+# Fichiers d'environnement et de configuration sensibles
+.env
+.env.local
+.env.*.local
+/.env
+
+# Configuration de l'IDE (exemples pour PHPStorm, VSCode, etc.)
+.idea/
+/.vscode/
+/*.iml
+
+# Fichiers de dépendances (Composer)
+composer.lock
+
+# Cache de tests PHPUnit
+.phpunit.result.cache
+
+# Configuration de déploiement Platform.sh
+.platform
+
+# Fichiers générés par l'OS
+.DS_Store
+Thumbs.db
+
+# Autres fichiers temporaires
+*.swp
+*.bak
+*.tmp
+*.temp
+*~
