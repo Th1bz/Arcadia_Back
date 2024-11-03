@@ -244,11 +244,16 @@ class AnimalController extends AbstractController
                 // Supprimer l'ancienne image si elle existe
                 $oldPicture = $animal->getPicture();
                 if ($oldPicture) {
+                    // Supprimer le fichier physique
                     $oldImagePath = $this->getParameter('kernel.project_dir') . '/public' . $oldPicture->getPictureData();
                     if (file_exists($oldImagePath)) {
                         unlink($oldImagePath);
                     }
+                    
+                    // Dissocier l'ancienne image de l'animal
+                    $animal->setPicture(null);
                     $this->manager->remove($oldPicture);
+                    $this->manager->flush(); // Flush immédiat pour supprimer l'ancienne image
                 }
 
                 // Créer la nouvelle image
@@ -295,6 +300,10 @@ class AnimalController extends AbstractController
             return $response;
 
         } catch (\Exception $e) {
+            // Ajouter ces lignes pour plus de détails
+            error_log('Erreur dans editAnimal: ' . $e->getMessage());
+            error_log('Trace: ' . $e->getTraceAsString());
+
             $response = new JsonResponse([
                 'message' => 'Une erreur est survenue lors de la modification de l\'animal',
                 'error' => $e->getMessage()
