@@ -1,5 +1,18 @@
 controllers:
     resource:
         path: ../src/Controller/
-        namespace: App\Controller\HomeController::home
+        namespace: App\Controller
     type: attribute
+
+api_routes:
+    resource: '../src/Controller/Api/'
+    type: attribute
+    name_prefix: 'api_'
+    defaults:
+        _format: json
+        
+api_mongo:
+    path: /api/mongo
+    controller: App\Controller\MongoAnimalController
+    defaults:
+        _format: json
