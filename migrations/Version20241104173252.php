@@ -21,20 +21,11 @@ final class Version20241104173252 extends AbstractMigration
 {
     
     
-    
-    
-    // 3. Supprimer d'abord la contrainte sur picture_data si elle existe
-    $this->addSql('ALTER TABLE habitat MODIFY picture_data VARCHAR(255) NULL');
-    
-    // 4. Puis supprimer la colonne
-    $this->addSql('ALTER TABLE habitat DROP COLUMN picture_data');
 }
 
 public function down(Schema $schema): void
 {
-    // Restaurer la colonne si nécessaire
-    $this->addSql('ALTER TABLE habitat ADD picture_data VARCHAR(255) DEFAULT NULL');
-    $this->addSql('DROP TABLE habitat_picture');
+    
 }
     
 }

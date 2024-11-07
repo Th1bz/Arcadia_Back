@@ -112,7 +112,7 @@ class Habitat
     public function removeHabitatPicture(HabitatPicture $habitatPicture): static
     {
         if ($this->habitatPictures->removeElement($habitatPicture)) {
-            // set the owning side to null (unless already changed)
+
             if ($habitatPicture->getHabitat() === $this) {
                 $habitatPicture->setHabitat(null);
             }
