@@ -7,6 +7,7 @@ use App\Entity\Habitat;
 use App\Entity\Race;
 use App\Entity\Picture;
 use App\Repository\AnimalRepository;
+use App\Service\AnimalLikeService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -410,4 +411,43 @@ class AnimalController extends AbstractController
         }
     }
 
+    
+    #[Route('/like/{id}', name: 'animal_increment_like', methods: ['POST', 'OPTIONS'])]
+    public function incrementLike(
+        string $id,
+        EntityManagerInterface $entityManager,
+        AnimalLikeService $likeService,
+    ): JsonResponse
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+            $response = new JsonResponse(null, 204);
+            $response->headers->set('Access-Control-Allow-Origin', '*');
+            $response->headers->set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+            $response->headers->set('Access-Control-Allow-Headers', 'Content-Type');
+            return $response;
+        }
+        
+        try {
+            // Conversion de l'ID en entier
+            $animalId = (int) $id;
+            
+            // Vérifier si l'animal existe
+            $animal = $entityManager->getRepository(Animal::class)->find($animalId);
+            
+            if (!$animal) {
+                return new JsonResponse(['error' => 'Animal non trouvé'], 404);
+            }
+    
+            // Incrémenter le like dans MongoDB
+            $likeService->incrementLike($animalId);
+    
+            return new JsonResponse(['message' => 'Like incrémenté avec succès']);
+            
+        } catch (\Exception $e) {
+            return new JsonResponse(
+                ['error' => 'Erreur lors de l\'incrémentation du like: ' . $e->getMessage()],
+                500
+            );
+        }
+}
 }
