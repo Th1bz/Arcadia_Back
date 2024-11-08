@@ -30,4 +30,14 @@ class AnimalLikeService
         $this->documentManager->persist($likeDoc);
         $this->documentManager->flush();
     }
+
+    public function getLikes(int $animalId): int
+    {
+        $likeDoc = $this->documentManager
+            ->getRepository(AnimalLike::class)
+            ->findOneBy(['animalId' => $animalId]);
+
+        return $likeDoc ? $likeDoc->getLikes() : 0;
+    }
+
 }

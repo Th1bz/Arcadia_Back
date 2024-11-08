@@ -412,8 +412,8 @@ class AnimalController extends AbstractController
     }
 
     
-    #[Route('/like/{id}', name: 'animal_increment_like', methods: ['POST', 'OPTIONS'])]
-    public function incrementLike(
+    #[Route('/like/{id}', name: 'animal_increment_like', methods: ['GET', 'POST', 'OPTIONS'])]
+    public function manageLike(
         string $id,
         EntityManagerInterface $entityManager,
         AnimalLikeService $likeService,
@@ -422,7 +422,7 @@ class AnimalController extends AbstractController
         if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
             $response = new JsonResponse(null, 204);
             $response->headers->set('Access-Control-Allow-Origin', '*');
-            $response->headers->set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+            $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
             $response->headers->set('Access-Control-Allow-Headers', 'Content-Type');
             return $response;
         }
@@ -438,10 +438,19 @@ class AnimalController extends AbstractController
                 return new JsonResponse(['error' => 'Animal non trouvé'], 404);
             }
     
-            // Incrémenter le like dans MongoDB
-            $likeService->incrementLike($animalId);
-    
-            return new JsonResponse(['message' => 'Like incrémenté avec succès']);
+            // Si c'est un GET, on retourne juste le nombre de likes
+            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                $likes = $likeService->getLikes($id);
+                $response = new JsonResponse(['likes' => $likes]);
+                $response->headers->set('Access-Control-Allow-Origin', '*');
+                return $response;
+            }
+
+            // Si c'est un POST, on incrémente le like
+            $likeService->incrementLike($id);
+            $response = new JsonResponse(['message' => 'Like incrémenté avec succès']);
+            $response->headers->set('Access-Control-Allow-Origin', '*');
+            return $response;
             
         } catch (\Exception $e) {
             return new JsonResponse(
@@ -449,5 +458,6 @@ class AnimalController extends AbstractController
                 500
             );
         }
-}
+    }
+
 }
