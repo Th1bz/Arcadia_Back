@@ -129,7 +129,7 @@ class EmployeReportController extends AbstractController
     try {
         $reports = $dm->getRepository(EmployeReport::class)->findBy(
             [],
-            ['visitDate' => 'DESC'] // tri par date de visite décroissante
+            ['visitDate' => 'DESC', 'visitTime' => 'DESC'] // tri par date et heure de visite décroissante
         );
 
         $formattedReports = [];
