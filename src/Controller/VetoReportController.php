@@ -37,17 +37,33 @@ class VetoReportController extends AbstractController
     }
 
     #[Route('/animal/{id}', name: 'get_by_animal', methods: ['GET'])]
-    public function getReportsByAnimal(string $id, DocumentManager $dm): JsonResponse
-    {
-        try {
-            $reports = $dm->getRepository(VetoReport::class)
-                ->findBy(['animalId' => (int)$id], ['visitDate' => 'DESC']);
+public function getReportsByAnimal(string $id, DocumentManager $dm): JsonResponse
+{
+    try {
+        $reports = $dm->getRepository(VetoReport::class)
+            ->findBy(['animalId' => (int)$id], ['visitDate' => 'DESC']);
 
-            return new JsonResponse(['reports' => $reports]);
-        } catch (\Exception $e) {
-            return new JsonResponse(['error' => $e->getMessage()], 400);
+        $formattedReports = [];
+        foreach ($reports as $report) {
+            $formattedReports[] = [
+                'id' => $report->getId(),
+                'animalId' => $report->getAnimalId(),
+                'username' => $report->getUsername(),
+                'visitDate' => $report->getVisitDate()->format('Y-m-d'),
+                'feedType' => $report->getFeedType(),
+                'feedQuantity' => $report->getFeedQuantity(),
+                'feedUnit' => $report->getFeedUnit(),
+                'comment' => $report->getComment()
+            ];
         }
+
+        return $this->json([
+            'reports' => $formattedReports
+        ]);
+    } catch (\Exception $e) {
+        return new JsonResponse(['error' => $e->getMessage()], 400);
     }
+}
 
     #[Route('/user/{username}', name: 'get_by_user', methods: ['GET'])]
     public function getReportsByUser(string $username, DocumentManager $dm): JsonResponse
@@ -103,4 +119,38 @@ class VetoReportController extends AbstractController
             return new JsonResponse(['error' => $e->getMessage()], 400);
         }
     }
+
+    // Ajouter cette nouvelle route
+#[Route('/all', name: 'get_all', methods: ['GET'])]
+public function getAllReports(DocumentManager $dm): JsonResponse
+{
+    try {
+        $reports = $dm->getRepository(VetoReport::class)->findBy(
+            [], // critères de recherche (vide pour tout récupérer)
+            ['visitDate' => 'DESC'] // tri par date de visite décroissante
+        );
+
+        $formattedReports = [];
+        foreach ($reports as $report) {
+            $formattedReports[] = [
+                'id' => $report->getId(),
+                'animalId' => $report->getAnimalId(),
+                'username' => $report->getUsername(),
+                'visitDate' => $report->getVisitDate()->format('Y-m-d'),
+                'feedType' => $report->getFeedType(),
+                'feedQuantity' => $report->getFeedQuantity(),
+                'feedUnit' => $report->getFeedUnit(),
+                'comment' => $report->getComment(),
+                'createdAt' => $report->getCreatedAt()->format('Y-m-d H:i:s')
+            ];
+        }
+
+        return $this->json([
+            'reports' => $formattedReports
+        ]);
+
+    } catch (\Exception $e) {
+        return new JsonResponse(['error' => $e->getMessage()], 400);
+    }
+}
 }
