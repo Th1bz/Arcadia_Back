@@ -30,9 +30,13 @@ class AvisController extends AbstractController
                 throw new \Exception('Données JSON invalides');
             }
 
+            // Sanitize Html à la création des données (pas de lecture des balises html)
+            $nom = htmlspecialchars($data['nom'], ENT_QUOTES, 'UTF-8');
+            $commentaire = htmlspecialchars($data['commentaire'], ENT_QUOTES, 'UTF-8');
+
             $avis = new Avis();
-            $avis->setNom($data['nom'] ?? '')
-                 ->setCommentaire($data['commentaire'] ?? '')
+            $avis->setNom($nom)
+                 ->setCommentaire($commentaire)
                  ->setNote((int) ($data['note'] ?? 0))
                  ->setIsValid(false); // Par défaut, l'avis n'est pas validé
 
