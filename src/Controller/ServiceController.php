@@ -27,9 +27,13 @@ class ServiceController extends AbstractController
         try {
             $data = json_decode($request->getContent(), true);
             
+            // Sanitize Html à la création des données
+            $name = htmlspecialchars($data['name'], ENT_QUOTES, 'UTF-8');
+            $description = htmlspecialchars($data['description'], ENT_QUOTES, 'UTF-8');
+
             $service = new Service();
-            $service->setName($data['name']);
-            $service->setDescription($data['description']);
+            $service->setName($name);
+            $service->setDescription($description);
 
             // Gestion de l'image
             if (!empty($data['pictureData'])) {
@@ -162,11 +166,13 @@ class ServiceController extends AbstractController
                 if ($existingService && $existingService->getId() !== $id) {
                     throw new \Exception('Un service avec ce nom existe déjà');
                 }
-                $service->setName($data['name']);
+                $name = htmlspecialchars($data['name'], ENT_QUOTES, 'UTF-8');
+                $service->setName($name);
             }
             
             if (isset($data['description'])) {
-                $service->setDescription($data['description']);
+                $description = htmlspecialchars($data['description'], ENT_QUOTES, 'UTF-8');
+                $service->setDescription($description);
             }
 
             // Gestion de la nouvelle image

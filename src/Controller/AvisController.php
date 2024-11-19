@@ -35,10 +35,10 @@ class AvisController extends AbstractController
             $commentaire = htmlspecialchars($data['commentaire'], ENT_QUOTES, 'UTF-8');
 
             $avis = new Avis();
-            $avis->setNom($nom)
-                 ->setCommentaire($commentaire)
-                 ->setNote((int) ($data['note'] ?? 0))
-                 ->setIsValid(false); // Par défaut, l'avis n'est pas validé
+            $avis->setNom($nom);
+            $avis->setCommentaire($commentaire);
+            $avis->setNote((int) ($data['note'] ?? 0));
+            $avis->setIsValid(false); // Par défaut, l'avis n'est pas validé
 
             $this->documentManager->persist($avis);
             $this->documentManager->flush();
