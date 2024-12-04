@@ -40,11 +40,15 @@ class AnimalController extends AbstractController
         try {
             $data = json_decode($request->getContent(), true);
             
+            // Sanitize Html à la création des données (pas de lecture des balises html)
+            $fisrtName = htmlspecialchars($data['firstName'], ENT_QUOTES, 'UTF-8');
+            $status = htmlspecialchars($data['status'], ENT_QUOTES, 'UTF-8');
+
             $animal = new Animal();
-            $animal->setFirstName($data['firstName']);
+            $animal->setFirstName($fisrtName);
             $animal->setRace($this->manager->getRepository(Race::class)->find($data['race']));
             $animal->setHabitat($this->manager->getRepository(Habitat::class)->find($data['habitat']));
-            $animal->setStatus($data['status'] ?? 'En bonne santé');
+            $animal->setStatus($status ?? 'En bonne santé');
 
             // Gestion de l'image si présente
             if (!empty($data['pictureData'])) {
@@ -228,7 +232,8 @@ class AnimalController extends AbstractController
 
             // Mise à jour des champs basiques
             if (isset($data['firstName'])) {
-                $animal->setFirstName($data['firstName']);
+                $firstName = htmlspecialchars($data['fisrtName'], ENT_QUOTES, 'UTF-8');
+                $animal->setFirstName($firstName);
             }
             if (isset($data['race'])) {
                 $race = $this->manager->getRepository(Race::class)->find($data['race']);
@@ -237,7 +242,8 @@ class AnimalController extends AbstractController
                 }
             }
             if (isset($data['status'])) {
-                $animal->setStatus($data['status']);
+                $status = htmlspecialchars($data['status'], ENT_QUOTES, 'UTF-8');
+                $animal->setStatus($status);
             }
 
             // Gestion de la nouvelle image
@@ -318,6 +324,15 @@ class AnimalController extends AbstractController
     #[Route('/picture/{id}', name: 'get_picture', methods: ['GET'])]
     public function getPicture(int $id): Response
     {
+
+        if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+            $response = new Response();
+            $response->headers->set('Access-Control-Allow-Origin', '*');
+            $response->headers->set('Access-Control-Allow-Methods', 'GET, OPTIONS');
+            $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With');
+            return $response;
+        }
+
         try {
             $picture = $this->manager->getRepository(Picture::class)->find($id);
             
@@ -345,6 +360,9 @@ class AnimalController extends AbstractController
             // Configurer les en-têtes
             $response->headers->set('Content-Type', $mimeType);
             $response->headers->set('Access-Control-Allow-Origin', '*');
+            $response->headers->set('Access-Control-Allow-Methods', 'GET, OPTIONS');
+            $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With');
+            $response->headers->set('Access-Control-Expose-Headers', 'Content-Length, Content-Type');
             $response->headers->set('Cache-Control', 'public, max-age=3600');
             
             return $response;

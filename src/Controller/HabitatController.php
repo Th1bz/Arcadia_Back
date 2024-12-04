@@ -25,9 +25,13 @@ class HabitatController extends AbstractController
         try {
             $data = json_decode($request->getContent(), true);
             
+            // Sanitize Html à la création des données (pas de lecture des balises html)
+            $name = htmlspecialchars($data['name'], ENT_QUOTES, 'UTF-8');
+            $description = htmlspecialchars($data['description'], ENT_QUOTES, 'UTF-8');
+
             $habitat = new Habitat();
-            $habitat->setName($data['name']);
-            $habitat->setDescription($data['description']);
+            $habitat->setName($name);
+            $habitat->setDescription($description);
 
             // Gestion de l'image
             if (!empty($data['pictureData'])) {
@@ -143,11 +147,13 @@ class HabitatController extends AbstractController
                 if ($existingHabitat && $existingHabitat->getId() !== $id) {
                     throw new \Exception('Un habitat avec ce nom existe déjà');
                 }
-                $habitat->setName($data['name']);
+                $name = htmlspecialchars($data['name'], ENT_QUOTES, 'UTF-8');
+                $habitat->setName($name);
             }
             
             if (isset($data['description'])) {
-                $habitat->setDescription($data['description']);
+                $description = htmlspecialchars($data['description'], ENT_QUOTES, 'UTF-8');
+                $habitat->setDescription($description);
             }
 
             // Gestion de la nouvelle image
@@ -279,6 +285,15 @@ class HabitatController extends AbstractController
     #[Route('/picture/{id}', name: 'get_picture', methods: ['GET'])]
     public function getPicture(int $id): Response
     {
+
+        if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+            $response = new Response();
+            $response->headers->set('Access-Control-Allow-Origin', '*');
+            $response->headers->set('Access-Control-Allow-Methods', 'GET, OPTIONS');
+            $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With');
+            return $response;
+        }
+
         try {
             $picture = $this->manager->getRepository(HabitatPicture::class)->find($id);
             
@@ -298,6 +313,9 @@ class HabitatController extends AbstractController
             
             $response->headers->set('Content-Type', $mimeType);
             $response->headers->set('Access-Control-Allow-Origin', '*');
+            $response->headers->set('Access-Control-Allow-Methods', 'GET, OPTIONS');
+            $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With');
+            $response->headers->set('Access-Control-Expose-Headers', 'Content-Length, Content-Type');
             $response->headers->set('Cache-Control', 'public, max-age=3600');
             
             return $response;
