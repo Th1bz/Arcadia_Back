@@ -10,10 +10,10 @@
 /var/sessions/
 
 # Fichiers d'environnement et de configuration sensibles
-.env
+# .env
 .env.local
 .env.*.local
-/.env
+# /.env
 
 # Configuration de l'IDE (exemples pour PHPStorm, VSCode, etc.)
 .idea/
@@ -27,7 +27,7 @@ composer.lock
 .phpunit.result.cache
 
 # Configuration de déploiement Platform.sh
-.platform
+# .platform
 
 # Fichiers générés par l'OS
 .DS_Store

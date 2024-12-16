@@ -3,13 +3,16 @@ name: app
 type: php:8.3
 
 runtime:
-    extensions:
-        - apcu
-        - mbstring
-        - sodium
-        - ctype
-        - iconv
-        
+  extensions:
+    - apcu
+    - mbstring
+    - sodium
+    - ctype
+    - iconv
+    - pdo_mysql # Important pour Symfony/Doctrine
+    - intl # Pour l'internationalisation
+    - zip # Pour Composer
+    - opcache
 
 #variables:
 #    php:
@@ -17,35 +20,33 @@ runtime:
 #        #opcache.preload: config/preload.php
 
 build:
-    flavor: none
+  flavor: none
 
 disk: 512
 
 web:
-    locations:
-        "/":
-            root: "public"
-            expires: 1h
-            passthru: "/index.php"
-
-
+  locations:
+    "/":
+      root: "public"
+      expires: 1h
+      passthru: "/index.php"
 
 mounts:
-    "/var": { source: local, source_path: var }
-    
-relationships:
-    database: 'database:mysql'
+  "/var": { source: local, source_path: var }
+  "/public/uploads": { source: local, source_path: uploads }
 
+relationships:
+  database: "database:mysql"
 
 hooks:
-    build: |
-        set -x -e
+  build: |
+    set -x -e
 
-        curl -fs https://get.symfony.com/cloud/configurator | bash
-        
-        NODE_VERSION=18 symfony-build
+    curl -fs https://get.symfony.com/cloud/configurator | bash
 
-    deploy: |
-        set -x -e
+    NODE_VERSION=18 symfony-build
 
-        symfony-deploy
+  deploy: |
+    set -x -e
+
+    symfony-deploy
