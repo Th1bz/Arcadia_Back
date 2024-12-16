@@ -1,3 +1,4 @@
 database:
-  type: mysql:16
+  type: mysql
+  version: 16.0
   disk: 512
