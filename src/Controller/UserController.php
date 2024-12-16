@@ -83,7 +83,7 @@ class UserController extends AbstractController
 
 
 
-   #[Route('/{id}', name: 'show', methods: 'GET')]
+   #[Route('/api/user/{id}', name: 'show', methods: 'GET')]
    public function show(int $id): Response
    {
         $user = $this->userRepository->findOneBy(['id' => $id]);
@@ -95,7 +95,7 @@ class UserController extends AbstractController
    }
 
 
-   #[Route('/{id}', name: 'edit', methods: 'PUT')]
+   #[Route('/api/user/{id}', name: 'edit', methods: 'PUT')]
    public function edit(int $id): Response
    {
         $user = $this->userRepository->findOneBy(['id' => $id]);
@@ -110,7 +110,7 @@ class UserController extends AbstractController
    }
 
 
-   #[Route('/{id}', name: 'delete', methods: 'DELETE')]
+   #[Route('/api/user/{id}', name: 'delete', methods: 'DELETE')]
    public function delete(int $id): Response
    {
     $user = $this->userRepository->findOneBy(['id' => $id]);
