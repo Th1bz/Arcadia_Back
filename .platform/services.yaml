@@ -2,7 +2,7 @@ database:
   type: mysql:11.0
   disk: 1024
 mongodb:
-  type: mongodb:7.0
+  type: mongodb:5.0
   disk: 512
   configuration:
     database:
