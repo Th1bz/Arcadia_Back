@@ -4,3 +4,6 @@ database:
 mongodb:
   type: mongodb:3.6
   disk: 512
+  configuration:
+    database:
+      - main
