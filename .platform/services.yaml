@@ -6,4 +6,4 @@ mongodb:
   disk: 512
   configuration:
     database:
-      - main
+      - arcadia
