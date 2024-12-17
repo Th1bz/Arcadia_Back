@@ -1,6 +1,12 @@
 database:
   type: mysql:11.0
   disk: 1024
+  configuration:
+    schemas:
+      - arcadia
+    endpoints:
+      mysql:
+        default_schema: arcadia
 mongodb:
   type: mongodb:3.6
   disk: 512
