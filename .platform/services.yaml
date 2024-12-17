@@ -7,6 +7,9 @@ database:
     endpoints:
       mysql:
         default_schema: arcadia
+        privileges:
+          arcadia: admin
+
 mongodb:
   type: mongodb:3.6
   disk: 512
