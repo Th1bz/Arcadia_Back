@@ -241,7 +241,7 @@ class AnimalController extends AbstractController
 
             // Mise à jour des champs basiques
             if (isset($data['firstName'])) {
-                $firstName = htmlspecialchars($data['fisrtName'], ENT_QUOTES, 'UTF-8');
+                $firstName = htmlspecialchars($data['firstName'], ENT_QUOTES, 'UTF-8');
                 $animal->setFirstName($firstName);
             }
             if (isset($data['race'])) {
@@ -286,11 +286,9 @@ class AnimalController extends AbstractController
                 $picture = new Picture();
                 $picture->setPictureData('/uploads/animals/' . $fileName);
                 $picture->setAnimal($animal);
-                error_log('Nom après modification: ' . $animal->getFirstName());
                 $this->manager->persist($picture);
-                error_log('Nom après modification: ' . $animal->getFirstName());
             }
-
+            
             $this->manager->flush();
 
             $response = new JsonResponse([
@@ -318,7 +316,6 @@ class AnimalController extends AbstractController
             return $response;
 
         } catch (\Exception $e) {
-            // Ajouter ces lignes pour plus de détails
             error_log('Erreur dans editAnimal: ' . $e->getMessage());
             error_log('Trace: ' . $e->getTraceAsString());
 

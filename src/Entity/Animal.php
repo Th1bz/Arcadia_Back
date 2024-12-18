@@ -15,7 +15,7 @@ class Animal
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: false)]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255)]
