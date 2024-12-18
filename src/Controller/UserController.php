@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Entity\Role;
 use App\Repository\RoleRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -123,4 +124,39 @@ class UserController extends AbstractController
 
     return $this->json(['message' => "User ressource deleted"], Response::HTTP_NO_CONTENT);
    }
+
+
+   #[Route('/init-roles', methods: 'GET')]
+   public function initRoles(): Response
+   {
+        // Vérifier si les rôles existent déjà
+        $existingRoles = $this->roleRepository->findAll();
+        if (!empty($existingRoles)) {
+        return $this->json(
+            ['message' => "Les rôles sont déjà initialisés"],
+            Response::HTTP_OK
+        );
+    }
+
+    // Créer les rôles
+    $roles = [
+        ['id' => 1, 'label' => 'admin'],
+        ['id' => 2, 'label' => 'veto'],
+        ['id' => 3, 'label' => 'employee']
+    ];
+
+    foreach ($roles as $roleData) {
+            $role = new Role();
+            // Pas besoin de setId car il est auto-incrémenté
+            $role->setLabel($roleData['label']);
+            $this->manager->persist($role);
+        }
+
+        $this->manager->flush();
+
+        return $this->json(
+            ['message' => "Rôles initialisés avec succès"],
+            Response::HTTP_CREATED
+        );
+}
 }
