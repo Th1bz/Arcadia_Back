@@ -286,7 +286,9 @@ class AnimalController extends AbstractController
                 $picture = new Picture();
                 $picture->setPictureData('/uploads/animals/' . $fileName);
                 $picture->setAnimal($animal);
+                error_log('Nom après modification: ' . $animal->getFirstName());
                 $this->manager->persist($picture);
+                error_log('Nom après modification: ' . $animal->getFirstName());
             }
 
             $this->manager->flush();
