@@ -375,6 +375,55 @@ class AnimalController extends AbstractController
             throw $this->createNotFoundException('Image non disponible');
         }
     }
+    
+    #[Route('/like/{id}', name: 'animal_increment_like', methods: ['GET', 'POST', 'OPTIONS'])]
+    public function manageLike(
+        string $id,
+        EntityManagerInterface $entityManager,
+        AnimalLikeService $likeService,
+    ): JsonResponse
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+            $response = new JsonResponse(null, 204);
+            $response->headers->set('Access-Control-Allow-Origin', '*');
+            $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+            $response->headers->set('Access-Control-Allow-Headers', 'Content-Type');
+            return $response;
+        }
+        
+        try {
+            // Conversion de l'ID en entier
+            $animalId = (int) $id;
+            
+            // Vérifier si l'animal existe
+            $animal = $entityManager->getRepository(Animal::class)->find($animalId);
+            
+            if (!$animal) {
+                return new JsonResponse(['error' => 'Animal non trouvé'], 404);
+            }
+    
+            // Si c'est un GET, on retourne juste le nombre de likes
+            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                $likes = $likeService->getLikes($id);
+                $response = new JsonResponse(['likes' => $likes]);
+                $response->headers->set('Access-Control-Allow-Origin', '*');
+                return $response;
+            }
+
+            // Si c'est un POST, on incrémente le like
+            $likeService->incrementLike($id);
+            $response = new JsonResponse(['message' => 'Like incrémenté avec succès']);
+            $response->headers->set('Access-Control-Allow-Origin', '*');
+            return $response;
+            
+        } catch (\Exception $e) {
+            return new JsonResponse(
+                ['error' => 'Erreur lors de l\'incrémentation du like: ' . $e->getMessage()],
+                500
+            );
+        }
+    }
+
 
     #[Route('/{id}', name: 'get_animal', methods: ['GET', 'OPTIONS'])]
     public function getAnimal(int $id): JsonResponse
@@ -428,54 +477,4 @@ class AnimalController extends AbstractController
             return $response;
         }
     }
-
-    
-    #[Route('/like/{id}', name: 'animal_increment_like', methods: ['GET', 'POST', 'OPTIONS'])]
-    public function manageLike(
-        string $id,
-        EntityManagerInterface $entityManager,
-        AnimalLikeService $likeService,
-    ): JsonResponse
-    {
-        if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-            $response = new JsonResponse(null, 204);
-            $response->headers->set('Access-Control-Allow-Origin', '*');
-            $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-            $response->headers->set('Access-Control-Allow-Headers', 'Content-Type');
-            return $response;
-        }
-        
-        try {
-            // Conversion de l'ID en entier
-            $animalId = (int) $id;
-            
-            // Vérifier si l'animal existe
-            $animal = $entityManager->getRepository(Animal::class)->find($animalId);
-            
-            if (!$animal) {
-                return new JsonResponse(['error' => 'Animal non trouvé'], 404);
-            }
-    
-            // Si c'est un GET, on retourne juste le nombre de likes
-            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $likes = $likeService->getLikes($id);
-                $response = new JsonResponse(['likes' => $likes]);
-                $response->headers->set('Access-Control-Allow-Origin', '*');
-                return $response;
-            }
-
-            // Si c'est un POST, on incrémente le like
-            $likeService->incrementLike($id);
-            $response = new JsonResponse(['message' => 'Like incrémenté avec succès']);
-            $response->headers->set('Access-Control-Allow-Origin', '*');
-            return $response;
-            
-        } catch (\Exception $e) {
-            return new JsonResponse(
-                ['error' => 'Erreur lors de l\'incrémentation du like: ' . $e->getMessage()],
-                500
-            );
-        }
-    }
-
 }
