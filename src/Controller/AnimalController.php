@@ -25,7 +25,7 @@ class AnimalController extends AbstractController
         
     }
 
-    #[Route('/add', name: 'add_animal', methods: ['POST', 'OPTIONS'])]
+    #[Route('/create', name: 'add_animal', methods: ['POST', 'OPTIONS'])]
     public function addAnimal(Request $request): JsonResponse
     {
         if ($request->getMethod() === 'OPTIONS') {
@@ -39,56 +39,39 @@ class AnimalController extends AbstractController
         try {
             $data = json_decode($request->getContent(), true);
             
-            // Vérification des données requises
-            if (!isset($data['firstName']) || !isset($data['race']) || !isset($data['habitat'])) {
-                throw new \Exception('Données manquantes : firstName, race et habitat sont requis');
-            }
-            
-            // Sanitize Html à la création des données
-            $firstName = htmlspecialchars($data['firstName'], ENT_QUOTES, 'UTF-8');
-            $status = isset($data['status']) ? htmlspecialchars($data['status'], ENT_QUOTES, 'UTF-8') : 'En bonne santé';
-
-            // Vérification de l'existence de la race et de l'habitat
-            $race = $this->manager->getRepository(Race::class)->find($data['race']);
-            $habitat = $this->manager->getRepository(Habitat::class)->find($data['habitat']);
-            
-            if (!$race || !$habitat) {
-                throw new \Exception('Race ou habitat non trouvé');
-            }
+            // Sanitize Html à la création des données (pas de lecture des balises html)
+            $fisrtName = htmlspecialchars($data['firstName'], ENT_QUOTES, 'UTF-8');
+            $status = htmlspecialchars($data['status'], ENT_QUOTES, 'UTF-8');
 
             $animal = new Animal();
-            $animal->setFirstName($firstName);
-            $animal->setRace($race);
-            $animal->setHabitat($habitat);
-            $animal->setStatus($status);
+            $animal->setFirstName($fisrtName);
+            $animal->setRace($this->manager->getRepository(Race::class)->find($data['race']));
+            $animal->setHabitat($this->manager->getRepository(Habitat::class)->find($data['habitat']));
+            $animal->setStatus($status ?? 'En bonne santé');
 
-            // Gestion de l'image
+            // Gestion de l'image si présente
             if (!empty($data['pictureData'])) {
-                try {
-                    $imageData = base64_decode($data['pictureData']);
-                    if ($imageData === false) {
-                        throw new \Exception('Données image invalides');
-                    }
-                    
-                    $fileName = uniqid() . '.jpg';
-                    $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads/animals/';
-                    
-                    if (!is_dir($uploadDir) && !mkdir($uploadDir, 0777, true)) {
-                        throw new \Exception('Impossible de créer le dossier uploads');
-                    }
-                    
-                    if (!file_put_contents($uploadDir . $fileName, $imageData)) {
-                        throw new \Exception('Impossible de sauvegarder l\'image');
-                    }
-                    
-                    $picture = new Picture();
-                    $picture->setPictureData('/uploads/animals/' . $fileName);
-                    $picture->setAnimal($animal);
-                    $this->manager->persist($picture);
-                } catch (\Exception $e) {
-                    // Log l'erreur mais continue sans l'image
-                    error_log('Erreur lors du traitement de l\'image: ' . $e->getMessage());
+                $imageData = base64_decode($data['pictureData']);
+                
+                // Générer un nom unique pour l'image
+                $fileName = uniqid() . '.jpg';
+                
+                // Définir le chemin de sauvegarde
+                $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads/animals/';
+                
+                // Créer le dossier s'il n'existe pas
+                if (!file_exists($uploadDir)) {
+                    mkdir($uploadDir, 0777, true);
                 }
+                
+                // Sauvegarder l'image
+                file_put_contents($uploadDir . $fileName, $imageData);
+                
+                // Créer l'entrée dans la base de données avec le chemin
+                $picture = new Picture();
+                $picture->setPictureData('/uploads/animals/' . $fileName);
+                $picture->setAnimal($animal);
+                $this->manager->persist($picture);
             }
 
             $this->manager->persist($animal);
