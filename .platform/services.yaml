@@ -11,7 +11,7 @@ database:
           arcadia: admin
 
 mongodb:
-  type: mongodb:4.4
+  type: mongodb:7.0
   disk: 512
   configuration:
     database:
