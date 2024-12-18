@@ -15,4 +15,4 @@ mongodb:
   disk: 512
   configuration:
     database:
-      - arcadia
+      - ArcadiaCluster
