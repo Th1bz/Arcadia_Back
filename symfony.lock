@@ -36,12 +36,12 @@
         ]
     },
     "doctrine/mongodb-odm-bundle": {
-        "version": "5.1",
+        "version": "4.7",
         "recipe": {
             "repo": "github.com/symfony/recipes-contrib",
             "branch": "main",
-            "version": "5.0",
-            "ref": "ed0a2da4b9351025c9e6e3837a0677d73f20e424"
+            "version": "4.4",
+            "ref": "429a3584f443e38fbf9ea5eaa5b34e5456194bef"
         },
         "files": [
             "config/packages/doctrine_mongodb.yaml",
