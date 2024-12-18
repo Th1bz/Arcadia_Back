@@ -32,9 +32,15 @@ web:
       expires: 1h
       passthru: "/index.php"
 
+    "/uploads/animals":
+      root: public/uploads/animals
+      scripts: false
+      allow: true
+
 mounts:
   "/var": { source: local, source_path: var }
   "/public/uploads": { source: local, source_path: uploads }
+  "/public/uploads/animal": { source: local, source_path: uploads/animal }
 
 relationships:
   database: "database:mysql"
