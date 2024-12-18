@@ -38,6 +38,9 @@ class AnimalController extends AbstractController
 
         try {
             $data = json_decode($request->getContent(), true);
+            error_log('Données reçues brutes: ' . $request->getContent());
+            error_log('Données décodées: ' . print_r($data, true));
+            error_log('firstName reçu: ' . $data['firstName']);
             
             // Sanitize Html à la création des données (pas de lecture des balises html)
             $fisrtName = htmlspecialchars($data['firstName'], ENT_QUOTES, 'UTF-8');
@@ -45,6 +48,7 @@ class AnimalController extends AbstractController
 
             $animal = new Animal();
             $animal->setFirstName($fisrtName);
+            error_log('firstName après setFirstName: ' . $animal->getFirstName());
             $animal->setRace($this->manager->getRepository(Race::class)->find($data['race']));
             $animal->setHabitat($this->manager->getRepository(Habitat::class)->find($data['habitat']));
             $animal->setStatus($status ?? 'En bonne santé');
@@ -75,7 +79,9 @@ class AnimalController extends AbstractController
             }
 
             $this->manager->persist($animal);
+            error_log('Animal avant flush - firstName: ' . $animal->getFirstName());
             $this->manager->flush();
+            error_log('Animal après flush - firstName: ' . $animal->getFirstName());
 
             $response = new JsonResponse([
                 'message' => 'Animal créé avec succès',
