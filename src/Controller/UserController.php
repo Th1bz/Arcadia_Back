@@ -125,7 +125,7 @@ class UserController extends AbstractController
     return $this->json(['message' => "User ressource deleted"], Response::HTTP_NO_CONTENT);
    }
 
-
+// ---------------------------------Initialisation des rôles----------------------------------
    #[Route('/init-roles', methods: 'GET')]
    public function initRoles(): Response
    {
@@ -158,5 +158,50 @@ class UserController extends AbstractController
             ['message' => "Rôles initialisés avec succès"],
             Response::HTTP_CREATED
         );
-}
+    }
+// ---------------------------------Fin Initialisation des rôles----------------------------------
+
+// ---------------------------------Création de l'admin----------------------------------   
+    #[Route('/create-admin', name: 'create_admin', methods: ['GET'])]
+    public function createAdmin(): Response
+    {
+        // Vérifier si l'admin existe déjà
+        $existingAdmin = $this->userRepository->findOneBy(['username' => 'admin@arcadia.com']);
+        if ($existingAdmin) {
+        return $this->json(
+            ['message' => "L'administrateur existe déjà"],
+            Response::HTTP_OK
+        );
+    }
+
+    // Créer un nouvel administrateur
+    $user = new User();
+    $user->setFirstName('Admin');
+    $user->setName('Admin');
+    $user->setUsername('admin@arcadia.com');
+    $user->setPassword('Azerty@1');
+
+    // Récupérer le rôle admin (ID = 1)
+    $role = $this->roleRepository->findOneBy(['id' => 1]);
+    if (!$role) {
+        return $this->json(
+            ['message' => "Le rôle administrateur n'existe pas"],
+            Response::HTTP_NOT_FOUND
+        );
+    }
+
+    $user->setRole($role);  // Modification ici pour définir correctement le rôle
+
+    $this->manager->persist($user);
+    $this->manager->flush();
+
+    return $this->json(
+        ['message' => "Administrateur créé avec succès", 'credentials' => [
+            'username' => 'admin@arcadia.com',
+            'password' => 'Azerty@1'
+        ]],
+        Response::HTTP_CREATED
+        );
+    }   
+    // ---------------------------------Fin Création de l'admin----------------------------------   
 }
