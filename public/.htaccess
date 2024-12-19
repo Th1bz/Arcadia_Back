@@ -8,6 +8,7 @@
     RewriteEngine On
     RewriteCond %{REQUEST_METHOD} OPTIONS
     RewriteRule ^(.*)$ $1 [R=200,L]
+    Header set Access-Control-Allow-Origin "https://th1bz-arcadia.alwaysdata.net"
 </IfModule> 
 
 <IfModule mod_rewrite.c>
