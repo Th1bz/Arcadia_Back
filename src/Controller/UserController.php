@@ -69,7 +69,7 @@ class UserController extends AbstractController
         $user = $this->userRepository->findOneBy(['username' => $username]);
         $roleId = $user->getRole()->getId();
         
-        if($password === $user->getPassword()) {
+        if(password_verify($password, $user->getPassword())) {
             return $this->json(
                 ['message' => "Connexion successful", 'user' => ['username' => $username, 'roleId' => $roleId]],
                 Response::HTTP_ACCEPTED,
@@ -140,9 +140,9 @@ class UserController extends AbstractController
 
     // Créer les rôles
     $roles = [
-        ['id' => 1, 'label' => 'admin'],
-        ['id' => 2, 'label' => 'veto'],
-        ['id' => 3, 'label' => 'employee']
+        ['id' => 1, 'label' => $_ENV['ROLE_ADMIN']],
+        ['id' => 2, 'label' => $_ENV['ROLE_VETO']],
+        ['id' => 3, 'label' => $_ENV['ROLE_EMPLOYEE']]
     ];
 
     foreach ($roles as $roleData) {
@@ -176,10 +176,10 @@ class UserController extends AbstractController
 
     // Créer un nouvel administrateur
     $user = new User();
-    $user->setFirstName('Admin');
-    $user->setName('Admin');
-    $user->setUsername('admin@arcadia.com');
-    $user->setPassword('Azerty@1');
+    $user->setFirstName($_ENV['ADMIN_FIRSTNAME']);
+    $user->setName($_ENV['ADMIN_LASTNAME']);
+    $user->setUsername($_ENV['ADMIN_EMAIL']);
+    $user->setPassword($_ENV['ADMIN_PASSWORD']);
 
     // Récupérer le rôle admin (ID = 1)
     $role = $this->roleRepository->findOneBy(['id' => 1]);
@@ -190,16 +190,13 @@ class UserController extends AbstractController
         );
     }
 
-    $user->setRole($role);  // Modification ici pour définir correctement le rôle
+    $user->setRole($role);  // Attribution du rôle admin
 
     $this->manager->persist($user);
     $this->manager->flush();
 
     return $this->json(
-        ['message' => "Administrateur créé avec succès", 'credentials' => [
-            'username' => 'admin@arcadia.com',
-            'password' => 'Azerty@1'
-        ]],
+        ['message' => "Administrateur créé avec succès"],
         Response::HTTP_CREATED
         );
     }   
